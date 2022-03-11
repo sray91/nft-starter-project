@@ -4,8 +4,6 @@ import { ethers } from "ethers";
 import React, { useEffect, useState } from "react";
 import myEpicNft from './utils/MyEpicNFT.json';
 
-const TWITTER_HANDLE = 'Swanagan';
-const TWITTER_LINK = `https://twitter.com/${Swanagan}`;
 const OPENSEA_LINK = '';
 const TOTAL_MINT_COUNT = 55;
 const CURRENT_MINT_COUNT = 0;
@@ -150,16 +148,10 @@ const App = () => {
           {currentAccount === "" ? renderNotConnectedContainer() : renderMintUI()}
         </div>
         <div className="body-container">
-          <p className="body-text">NFTs minted so far!</p>
+          <p className="body-text">{CURRENT_MINT_COUNT}/{TOTAL_MINT_COUNT} NFTs minted so far!</p>
         </div>
         <div className="footer-container">
           <img alt="Twitter Logo" className="twitter-logo" src={twitterLogo} />
-          <a
-            className="footer-text"
-            href={TWITTER_LINK}
-            target="_blank"
-            rel="noreferrer"
-          >{`built by @${TWITTER_HANDLE}`}</a>
         </div>
       </div>
     </div>
