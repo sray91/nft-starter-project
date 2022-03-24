@@ -3,17 +3,21 @@ import twitterLogo from './assets/twitter-logo.svg';
 import { ethers } from "ethers";
 import React, { useEffect, useState } from "react";
 import myEpicNft from './utils/MyEpicNFT.json';
+import { Loading } from "react-loading-dot";
 
-const OPENSEA_LINK = '';
+const OPENSEA_LINK = "https://testnets.opensea.io/collection/stoicnft-eimjddcifq";
 const TOTAL_MINT_COUNT = 55;
-const CURRENT_MINT_COUNT = 0;
+const TWITTER_LINK = "https://twitter.com/Swanagan";
+const TWITTER_HANDLE = "eewatchguy.eth";
 
 // I moved the contract address to the top for easy access.
-const CONTRACT_ADDRESS = "0x8d3476309b67c0Baf246Ef0b285a2311A05cc2D0";
+const CONTRACT_ADDRESS = "0x9905Bf40e406E44f436f60A8b08BfeF667Ac6C1a";
 
 const App = () => {
 
   const [currentAccount, setCurrentAccount] = useState("");
+  const [mintedSoFar, setMintedSoFar] = useState('0');
+  const [isLoading, setIsLoading] = useState(false);
     
   const checkIfWalletIsConnected = async () => {
     const { ethereum } = window;
@@ -37,6 +41,14 @@ const App = () => {
       setupEventListener()
     } else {
       console.log("No authorized account found")
+    }
+    let chainId = await ethereum.request({ method: 'eth_chainId' });
+    console.log("Connected to chain " + chainId);
+
+    // String, hex code of the chainId of the Rinkebey test network
+    const rinkebyChainId = "0x4"; 
+    if (chainId !== rinkebyChainId) {
+	    alert("You are not connected to the Rinkeby Test Network!");
     }
   }
 
@@ -108,7 +120,6 @@ const App = () => {
         await nftTxn.wait();
         console.log(nftTxn);
         console.log(`Mined, see transaction: https://rinkeby.etherscan.io/tx/${nftTxn.hash}`);
-
       } else {
         console.log("Ethereum object doesn't exist!");
       }
@@ -117,8 +128,12 @@ const App = () => {
     }
   }
 
-  const getTotalNFTsMintedSoFar = () => {
-    //CURRENT_MINT_TOTAL = tokenId.toNumber()
+  const getTotalNFTsMintedSoFar = async () => {
+    const provider = new ethers.providers.Web3Provider(ethereum);
+    const signer = provider.getSigner();
+    const connectedContract = new ethers.Contract(CONTRACT_ADDRESS, myEpicNft.abi, signer);
+    let nft = await connectedContract.getTotalNFTsMintedSoFar();
+    setMintedSoFar(nft.toNumber());
   }
 
   useEffect(() => {
@@ -131,8 +146,18 @@ const App = () => {
     </button>
   );
 
+  const fireSomeFunctions = () => (
+    askContractToMintNft(),
+    getTotalNFTsMintedSoFar(),
+    renderLoading()
+  );
+
+  const renderLoading = () => (
+    <Loading background="#ffffff"/>
+  )
+
   const renderMintUI = () => (
-    <button onClick={askContractToMintNft} className="cta-button connect-wallet-button">
+    <button onClick={fireSomeFunctions} className="cta-button connect-wallet-button">
       Mint NFT
     </button>
   )
@@ -147,11 +172,20 @@ const App = () => {
           </p>
           {currentAccount === "" ? renderNotConnectedContainer() : renderMintUI()}
         </div>
-        <div className="body-container">
-          <p className="body-text">{CURRENT_MINT_COUNT}/{TOTAL_MINT_COUNT} NFTs minted so far!</p>
+          <div className="body-container">
+            <p className="body-text">{`${mintedSoFar}/${TOTAL_MINT_COUNT} NFTs minted so far!`}</p>
+          </div>
+        <div>
+          <button className="cta-button connect-wallet-button"><a className="body-text" href={OPENSEA_LINK} target="_blank">🌊 View Collection on OpenSea</a></button>
         </div>
         <div className="footer-container">
           <img alt="Twitter Logo" className="twitter-logo" src={twitterLogo} />
+          <a
+            className="footer-text"
+            href={TWITTER_LINK}
+            target="_blank"
+            rel="noreferrer"
+          >{`@${TWITTER_HANDLE}`}</a>
         </div>
       </div>
     </div>

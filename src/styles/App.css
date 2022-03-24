@@ -42,6 +42,7 @@
   padding-right: 40px;
   border-radius: 5px;
   cursor: pointer;
+  text-decoration: none;
   font-size: 16px;
   font-weight: bold;
   color: white;
@@ -62,6 +63,10 @@
 
 .opensea-button {
   background-color: rgb(32, 129, 226);
+}
+
+a {
+  text-decoration: none;
 }
 
 .mint-count {
